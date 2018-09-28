@@ -1903,7 +1903,11 @@ def test_run_defaults(monkeypatch, app):
     assert rv['result'] == 'running...'
 
 
-def test_run_server_port(monkeypatch, app):
+@pytest.mark.parametrize('hostname,port', (
+        ('localhost', '8000'),
+        ('localhost', '0'),
+))
+def test_run_server_port(monkeypatch, hostname, port, app):
     rv = {}
 
     # Mocks werkzeug.serving.run_simple method
@@ -1911,7 +1915,6 @@ def test_run_server_port(monkeypatch, app):
         rv['result'] = 'running on %s:%s ...' % (hostname, port)
 
     monkeypatch.setattr(werkzeug.serving, 'run_simple', run_simple_mock)
-    hostname, port = 'localhost', 8000
     app.run(hostname, port, debug=True)
     assert rv['result'] == 'running on %s:%s ...' % (hostname, port)
 
